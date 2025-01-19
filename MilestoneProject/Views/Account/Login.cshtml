@@ -1,0 +1,24 @@
+﻿@model MilestoneProject.Models.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<h2>Login</h2>
+
+<form asp-action="Login" method="post">
+    <div>
+        <label>Email Address:</label>
+        <input asp-for="email" type="email" class="form-control" />
+        <span asp-validation-for="email" class="text-danger"></span>
+    </div>
+    <div>
+        <label>Password:</label>
+        <input asp-for="password" type="password" class="form-control" />
+        <span asp-validation-for="password" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Login</button>
+</form>
+<div>
+    <a href="@Url.Action("Index", "Registration")">Don't have an account? Register here.</a>
+</div>

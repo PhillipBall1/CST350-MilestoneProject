@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using MilestoneProject.Models;
+
 namespace MilestoneProject
 {
     public class Program
@@ -8,6 +11,13 @@ namespace MilestoneProject
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            // Connect to DB
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            builder.Services.AddDbContext<DBContext>(options => options.UseSqlServer(connectionString));
+
+            // Add Debug logging
+            builder.Logging.AddDebug();
 
             var app = builder.Build();
 
