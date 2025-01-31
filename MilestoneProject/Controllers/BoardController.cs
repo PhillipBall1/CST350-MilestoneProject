@@ -13,6 +13,10 @@ namespace MilestoneProject.Controllers
 
         private readonly BoardService boardService;
 
+        private float finalScore;
+
+        private int baseScore = 500;
+
         public BoardController(BoardService boardService)
         {
             this.boardService = boardService;
@@ -21,6 +25,9 @@ namespace MilestoneProject.Controllers
         [HttpPost] // Reveal Action From View (Using post to send x and y)
         public IActionResult RevealTile(int x, int y)
         {
+            // start a timer
+            if(boardService.startTime == new DateTime(2000, 1, 1, 2, 3, 4)) boardService.startTime = DateTime.Now;
+
             // already revealed
             if (boardService.board[x, y].isRevealed) return RedirectToAction("Index");
 
@@ -91,7 +98,19 @@ namespace MilestoneProject.Controllers
         public IActionResult Index()
         {
             // win condition
-            if(CheckWin()) Console.WriteLine("User won");
+            if (CheckWin())
+            {
+                // calculate elapsed time
+                TimeSpan difference = DateTime.Now - boardService.startTime;
+
+                // get seconds from time difference
+                float elapsedTime = (difference.Minutes * 60) + difference.Seconds;
+
+                // calculate final score
+                finalScore = ((baseScore * boardService.boardSize * boardService.boardDifficulty) / elapsedTime);
+
+                Console.WriteLine($"User won with a score of {finalScore} after {elapsedTime} seconds");
+            }
 
             return View(boardService.board);
         }

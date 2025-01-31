@@ -2,9 +2,17 @@
 
 public class BoardService
 {
+    // board matrix
     public TileModel[,] board { get; private set; }
+
+    // size of the board, default 10
     public int boardSize { get; set; } = 10;
-    private int boardDifficulty { get; set; } = 10;
+
+    // 1 to 10 range each representing 10% (1 meaning there is a 10% chance for a tile to be a bomb)
+    public int boardDifficulty { get; set; } = 1; 
+
+    // time that this board is generated
+    public DateTime startTime { get; set; } = new DateTime(2000,1,1,2,3,4);
 
     public BoardService()
     {
@@ -19,7 +27,7 @@ public class BoardService
         {
             for (int y = 0; y < boardSize; y++)
             {
-                bool isBomb = new Random().Next(100) < boardDifficulty;
+                bool isBomb = new Random().Next(10) < boardDifficulty;
                 board[x, y] = new TileModel(x, y, isBomb);
             }
         }
