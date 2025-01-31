@@ -12,9 +12,22 @@ namespace MilestoneProject
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
+            // Board Service Singleton
+            builder.Services.AddSingleton<BoardService>();
+
             // Connect to DB
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
             builder.Services.AddDbContext<DBContext>(options => options.UseSqlServer(connectionString));
+
+
+            // Set up authentication with cookie
+            builder.Services.AddAuthentication("CookieAuth").AddCookie("CookieAuth", options =>
+            {
+                options.Cookie.Name = "CookieAuth";
+                options.LoginPath = "/Account/Login"; // Redirect to Login page
+                options.AccessDeniedPath = "/Account/AccessDenied"; // Redirect if access is denied
+            });
+            builder.Services.AddAuthorization();
 
             // Add Debug logging
             builder.Logging.AddDebug();
@@ -33,6 +46,8 @@ namespace MilestoneProject
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

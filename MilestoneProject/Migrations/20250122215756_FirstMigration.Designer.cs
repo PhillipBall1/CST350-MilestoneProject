@@ -11,8 +11,8 @@ using MilestoneProject.Models;
 namespace MilestoneProject.Migrations
 {
     [DbContext(typeof(DBContext))]
-    [Migration("20250119213353_Initial")]
-    partial class Initial
+    [Migration("20250122215756_FirstMigration")]
+    partial class FirstMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -64,7 +64,7 @@ namespace MilestoneProject.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("registrations");
+                    b.ToTable("UserRegistrations");
                 });
 #pragma warning restore 612, 618
         }

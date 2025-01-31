@@ -4,12 +4,12 @@
 
 namespace MilestoneProject.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class FirstMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "registrations",
+                name: "UserRegistrations",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -25,14 +25,14 @@ namespace MilestoneProject.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_registrations", x => x.Id);
+                    table.PrimaryKey("PK_UserRegistrations", x => x.Id);
                 });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "registrations");
+                name: "UserRegistrations");
         }
     }
 }

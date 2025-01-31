@@ -1,0 +1,47 @@
+﻿@model TileModel[,]
+
+<link rel="stylesheet" href="~/css/GameBoard.css" />
+@{
+    int boardSize = Model.GetLength(0);
+}
+
+<style>
+    .board {
+        display: grid;
+        grid-template-columns: repeat(@boardSize, 40px);
+    }
+</style>
+
+<h2>Minesweeper</h2>
+
+<div class="container">
+    <div class="board">
+        @for (int x = 0; x < boardSize; x++)
+        {
+            @for (int y = 0; y < boardSize; y++)
+            {
+                var tile = Model[x, y];
+                string tileClass = tile.isRevealed ? "revealed" : "tile";
+                string textClass = tile.neighborBombs > 0 ? $"number-{tile.neighborBombs}" : "";
+
+                <form method="post" asp-action="RevealTile">
+                    <input type="hidden" name="x" value="@x" />
+                    <input type="hidden" name="y" value="@y" />
+                    <button type="submit" class="@tileClass">
+                        @if (tile.isRevealed)
+                        {
+                            if (tile.isBomb)
+                            {
+                                <span>X</span>
+                            }
+                            else if (tile.neighborBombs > 0)
+                            {
+                                <span class="@textClass">@tile.neighborBombs</span>
+                            }
+                        }
+                    </button>
+                </form>
+            }
+        }
+    </div>
+</div>

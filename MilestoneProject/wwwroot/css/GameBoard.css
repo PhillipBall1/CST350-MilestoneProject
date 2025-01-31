@@ -1,0 +1,62 @@
+﻿.container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    position: relative; 
+}
+
+.number-1 {
+    color: blue;
+    text-shadow: 1px 1px 2px black;
+}
+
+.number-2 {
+    color: green;
+    text-shadow: 1px 1px 2px black;
+}
+
+.number-3 {
+    color: orange;
+    text-shadow: 1px 1px 2px black;
+}
+
+.number-4 {
+    color: darkorange;
+    text-shadow: 1px 1px 2px black;
+}
+
+.number-5 {
+    color: red;
+    text-shadow: 1px 1px 2px black;
+}
+
+.number-6 {
+    color: darkred;
+    text-shadow: 1px 1px 2px black;
+}
+
+.number-7 {
+    color: purple;
+    text-shadow: 1px 1px 2px black;
+}
+
+.number-8 {
+    color: black;
+    text-shadow: 1px 1px 2px white;
+}
+
+form button {
+    width: 40px;
+    height: 40px;
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
+    background-color: #aaa;
+    border: 1px solid #888;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.revealed {
+    background-color: #fff;
+}

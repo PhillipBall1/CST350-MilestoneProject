@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using MilestoneProject.Models;
-using System.Linq;
+using System.Security.Claims;
 
 namespace MilestoneProject.Controllers
 {
@@ -21,7 +21,7 @@ namespace MilestoneProject.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(LoginViewModel model)
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -29,6 +29,20 @@ namespace MilestoneProject.Controllers
 
                 if (user != null && user.password == model.password)
                 {
+                    // Create claims for user
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, user.username),
+                        new Claim(ClaimTypes.Email, user.email),
+                        new Claim(ClaimTypes.Role, "User")
+                    };
+
+                    var identity = new ClaimsIdentity(claims, "CookieAuth");
+                    var principal = new ClaimsPrincipal(identity);
+
+                    // Sign in the user with cookie authentication
+                    await HttpContext.SignInAsync("CookieAuth", principal);
+
                     return RedirectToAction("Index", "Home");
                 }
 
@@ -36,6 +50,14 @@ namespace MilestoneProject.Controllers
             }
 
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            // Sign out the user and clear the authentication cookie
+            await HttpContext.SignOutAsync("CookieAuth");
+            return RedirectToAction("Login", "Account"); // Redirect to the login page
         }
     }
 }
