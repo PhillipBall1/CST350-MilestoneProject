@@ -32,7 +32,7 @@ namespace MilestoneProject.Controllers
             if (boardService.board[x, y].isRevealed) return RedirectToAction("Index");
 
             // lose condition
-            if(boardService.board[x, y].isBomb) Console.WriteLine("User lost");
+            if(boardService.board[x, y].isBomb) return RedirectToAction("Lose");
 
             // set revealed
             boardService.board[x, y].isRevealed = true;
@@ -87,6 +87,7 @@ namespace MilestoneProject.Controllers
                     // if tiles are not revealed or not a bomb return false
                     if (!boardService.board[row, column].isRevealed && !boardService.board[row, column].isBomb)
                     {
+                        
                         return false;
                     }
                 }
@@ -108,8 +109,10 @@ namespace MilestoneProject.Controllers
 
                 // calculate final score
                 finalScore = ((baseScore * boardService.boardSize * boardService.boardDifficulty) / elapsedTime);
+                
 
                 Console.WriteLine($"User won with a score of {finalScore} after {elapsedTime} seconds");
+                return RedirectToAction("Win");
             }
 
             return View(boardService.board);
