@@ -1,0 +1,11 @@
+﻿@model TileModel
+
+<button class="tile" data-x="@ViewData["x"]" data-y="@ViewData["y"]">
+    @if (Model.isRevealed)
+    {
+        if (Model.neighborBombs > 0)
+        {
+            <span class="number-@Model.neighborBombs">@Model.neighborBombs</span>
+        }
+    }
+</button>

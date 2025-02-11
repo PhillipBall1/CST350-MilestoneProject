@@ -1,0 +1,57 @@
+﻿<div class="game-won-container">
+    <h1 class="game-won-title">You Won!</h1>
+    <h3 class="game-won-score">Your score: <strong>@ViewBag.Score</strong></h3>
+    <h3 class="game-won-time">Completed in <strong>@ViewBag.Time</strong> seconds</h3>
+
+    <button onclick="location.href='@Url.Action("Index", "Board", new { boardSize = ViewBag.BoardSize, difficulty = ViewBag.Difficulty })'" class="restart-button">
+        Play Again
+    </button>
+
+    <button onclick="location.href='@Url.Action("Index", "Home")'" class="menu-button">
+        Back to Menu
+    </button>
+</div>
+
+<style>
+    .game-won-container {
+        text-align: center;
+        font-family: 'Arial', sans-serif;
+        margin-top: 50px;
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    .game-won-title {
+        font-size: 3rem;
+        color: #fff;
+        text-shadow: 2px 2px 8px black;
+    }
+
+    .game-won-score, .game-won-time {
+        font-size: 1.5rem;
+        color: #555;
+    }
+
+    .menu-button, .restart-button {
+        padding: 10px 20px;
+        font-size: 1.2rem;
+        color: white;
+        background-color: #007bff;
+        border: none;
+        border-radius: 5px;
+        margin: 10px;
+        cursor: pointer;
+        transition: background-color 1s ease;
+    }
+
+    .menu-button:hover {
+        background-color: #0056b3;
+    }
+
+    .restart-button {
+        background-color: #28a745;
+    }
+
+    .restart-button:hover {
+        background-color: #218838;
+    }
+</style>

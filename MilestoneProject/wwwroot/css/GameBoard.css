@@ -1,11 +1,4 @@
-﻿.container {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    position: relative; 
-}
-
-.number-1 {
+﻿.number-1 {
     color: blue;
     text-shadow: 1px 1px 2px black;
 }
@@ -45,14 +38,7 @@
     text-shadow: 1px 1px 2px white;
 }
 
-form button {
-    width: 40px;
-    height: 40px;
-    font-weight: bold;
-    font-size: 16px;
-    text-align: center;
-    background-color: #aaa;
-    border: 1px solid #888;
+.tile, .revealed {
     cursor: pointer;
     pointer-events: auto;
 }

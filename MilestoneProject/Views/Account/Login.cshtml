@@ -17,8 +17,10 @@
         <input asp-for="password" type="password" class="form-control" />
         <span asp-validation-for="password" class="text-danger"></span>
     </div>
+    <br />
     <button type="submit" class="btn btn-primary">Login</button>
 </form>
+<br />
 <div>
-    <a href="@Url.Action("Index", "Registration")">Don't have an account? Register here.</a>
+    <a href="@Url.Action("Index", "Registration")">Register today!</a>
 </div>

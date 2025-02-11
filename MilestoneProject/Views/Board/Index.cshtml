@@ -1,18 +1,14 @@
 ﻿@model TileModel[,]
 
 <link rel="stylesheet" href="~/css/GameBoard.css" />
+
 @{
     int boardSize = Model.GetLength(0);
 }
 
-<style>
-    .board {
-        display: grid;
-        grid-template-columns: repeat(@boardSize, 40px);
-    }
-</style>
+<h2 style="text-align:center;">Minesweeper</h2>
 
-<h2>Minesweeper</h2>
+<div class="timer" id="timer">Time: 0s</div>
 
 <div class="container">
     <div class="board">
@@ -21,27 +17,158 @@
             @for (int y = 0; y < boardSize; y++)
             {
                 var tile = Model[x, y];
-                string tileClass = tile.isRevealed ? "revealed" : "tile";
-                string textClass = tile.neighborBombs > 0 ? $"number-{tile.neighborBombs}" : "";
-
-                <form method="post" asp-action="RevealTile">
-                    <input type="hidden" name="x" value="@x" />
-                    <input type="hidden" name="y" value="@y" />
-                    <button type="submit" class="@tileClass">
-                        @if (tile.isRevealed)
-                        {
-                            if (tile.isBomb)
-                            {
-                                <span>X</span>
-                            }
-                            else if (tile.neighborBombs > 0)
-                            {
-                                <span class="@textClass">@tile.neighborBombs</span>
-                            }
-                        }
-                    </button>
-                </form>
+                ViewData["x"] = x;
+                ViewData["y"] = y;
+                <div class="tile-wrapper"  style="font-size: @ViewBag.FontSize;" data-coordinate="@x-@y">
+                    @await Html.PartialAsync("_Tile", tile)
+                </div>
             }
         }
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        let startTime;
+        let timerInterval;
+        let isTimerRunning = false;
+
+        // timer start
+        function startTimer() {
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+            isTimerRunning = true;
+        }
+
+        // timer update
+        function updateTimer() {
+            const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById('timer').innerText = `Time: ${elapsedTime}s`;
+        }
+
+        // timer stop
+        function stopTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false; 
+        }
+
+        // tile right click work around with 'context menu'
+        $(document).on('contextmenu', '.tile', function (e) {
+            e.preventDefault(); 
+
+            // if flagged, remove it, if not, add it
+            if ($(this).hasClass('tile-wrapper-img')) $(this).removeClass('tile-wrapper-img');
+            else $(this).addClass('tile-wrapper-img');
+        });
+
+        // tile click
+        $(document).on('click', '.tile', function (e) {
+            e.preventDefault();
+
+            const button = $(this);
+            const x = button.data('x');
+            const y = button.data('y');
+
+            // if flagged tile, return
+            if ($(this).hasClass('tile-wrapper-img')) return; 
+
+            // start timer if the timer is not running
+            if (!isTimerRunning) startTimer();
+
+            // reveal tile 
+            $.ajax({
+                url: '/Board/RevealTile', 
+                type: 'POST',
+                data: { x: x, y: y }, 
+                success: function (response) {
+                    // calculate the elapsed time against the start time
+                    const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+
+                    // win or loss handler for redirection
+                    if (response.redirect) {
+
+                        // sends elapsed time to IAction Won and Lost
+                        window.location.href = response.redirect + `?elapsedTime=${elapsedTime}`;
+                        return;
+                    }
+
+                    // for each tile inside of boardService.revealedTiles, create a new tile revealing their new state
+                    response.forEach(function (tile) {
+                        var tileElement = $('.tile[data-x="' + tile.x + '"][data-y="' + tile.y + '"]');
+                        tileElement.replaceWith(`
+                            <button  style="font-size: @ViewBag.FontSize;" class="revealed ${tile.neighborBombs > 0 ? 'number-' + tile.neighborBombs : ''}" data-x="${tile.x}" data-y="${tile.y}">
+                                ${tile.neighborBombs > 0 ? tile.neighborBombs : ''}
+                            </button>
+                        `);
+                    });
+                },
+                error: function () {
+                    alert("An error occurred while revealing the tiles.");
+                }
+            });
+        });
+
+    </script>
+}
+
+<style>
+    .board {
+        display: grid;
+        gap: 0;
+        grid-template-columns: repeat(@boardSize, @ViewBag.TileSize);
+    }
+
+    .tile-wrapper {
+        display: flex;
+        width: @ViewBag.TileSize;
+        height: @ViewBag.TileSize;
+        
+    }
+
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        position: relative;
+    }
+
+    .tile-wrapper button {
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        font-weight: bold;
+        text-align: center;
+        border: 1px solid #888;
+        cursor: pointer;
+    }
+
+    .tile{
+        background-color: lightgray;
+    }
+
+    .revealed{
+        background-color: #fff;
+    }
+
+    .tile-wrapper-img {
+        background-image: url('/images/f.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        font-weight: bold;
+        text-align: center;
+        border: 1px solid #888;
+        cursor: pointer;
+    }
+
+    .timer {
+        text-align: center;
+        font-weight: bold;
+        font-size: 25px;
+    }
+
+</style>
