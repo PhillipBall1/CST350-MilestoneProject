@@ -4,6 +4,8 @@
 
 @{
     int boardSize = Model.GetLength(0);
+
+    var userId = User.Identity.Name;
 }
 
 <h2 style="text-align:center;">Minesweeper</h2>
@@ -27,12 +29,15 @@
     </div>
 </div>
 
+<button class="save">Save Game</button>
+
 @section Scripts {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         let startTime;
         let timerInterval;
         let isTimerRunning = false;
+        let fontSize = "@ViewBag.FontSize";
 
         // timer start
         function startTimer() {
@@ -65,7 +70,6 @@
         // tile click
         $(document).on('click', '.tile', function (e) {
             e.preventDefault();
-
             const button = $(this);
             const x = button.data('x');
             const y = button.data('y');
@@ -97,10 +101,15 @@
                     response.forEach(function (tile) {
                         var tileElement = $('.tile[data-x="' + tile.x + '"][data-y="' + tile.y + '"]');
                         tileElement.replaceWith(`
-                            <button  style="font-size: @ViewBag.FontSize;" class="revealed ${tile.neighborBombs > 0 ? 'number-' + tile.neighborBombs : ''}" data-x="${tile.x}" data-y="${tile.y}">
+                            <button style="font-size: ${fontSize};" 
+                                class="revealed ${tile.neighborBombs > 0 ? 'number-' + tile.neighborBombs : ''}" 
+                                data-x="${tile.x}" 
+                                data-y="${tile.y}" 
+                                data-neighbor-bombs="${tile.neighborBombs}">
                                 ${tile.neighborBombs > 0 ? tile.neighborBombs : ''}
                             </button>
                         `);
+
                     });
                 },
                 error: function () {
@@ -108,6 +117,63 @@
                 }
             });
         });
+
+        $(document).on("click", ".save", function (e) {
+            e.preventDefault();
+
+            let gameData = [];
+
+            $(".tile-wrapper button").each(function () {
+                let x = parseInt($(this).attr("data-x"));
+                let y = parseInt($(this).attr("data-y"));
+                let neighborBombs = parseInt($(this).attr("data-neighbor-bombs")) || 0;
+
+                if (isNaN(x) || isNaN(y) || isNaN(neighborBombs)) return;
+
+                let tile = {
+                    row: x,
+                    column: y,
+                    isRevealed: $(this).hasClass("revealed"),
+                    isBomb: $(this).hasClass("bomb"),
+                    isFlagged: $(this).hasClass("tile-wrapper-img"),
+                    neighborBombs: neighborBombs
+                };
+
+                console.log("Tile Saved:", tile);
+                gameData.push(tile);
+            });
+
+
+            let requestData = {
+                UserEmail: "@ViewBag.UserEmail",
+                DateSaved: new Date().toISOString(),
+                GameData: JSON.stringify(gameData)
+            };
+
+            // Debug: Log request data before sending
+            console.log("Final Request Data:", requestData);
+
+            // Send to backend
+            $.ajax({
+                url: "/Game/SaveGame",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(requestData),
+                success: function (response) {
+                    console.log("AJAX Success:", response);
+                    alert("Game Saved Successfully!");
+                },
+                error: function (xhr, status, error) {
+                    console.error("AJAX Error:", {
+                        status: status,
+                        error: error,
+                        responseText: xhr.responseText
+                    });
+                    alert("An error occurred while saving the game.");
+                }
+            });
+        });
+
 
     </script>
 }

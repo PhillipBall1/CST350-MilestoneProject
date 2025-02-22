@@ -1,11 +1,31 @@
 ﻿@model TileModel
 
-<button class="tile" data-x="@ViewData["x"]" data-y="@ViewData["y"]">
-    @if (Model.isRevealed)
+<link rel="stylesheet" href="~/css/GameBoard.css" />
+
+@if (Model == null)
+{
+    <button class="tile error"> X </button>
+}
+else
+{
+    @if (!Model.isBomb)
     {
-        if (Model.neighborBombs > 0)
+        @if (Model.isRevealed)
         {
-            <span class="number-@Model.neighborBombs">@Model.neighborBombs</span>
+            <button class="revealed" data-x="@ViewData["x"]" data-y="@ViewData["y"]">
+                @if (Model.neighborBombs > 0)
+                {
+                    <span class="number-@Model.neighborBombs">@Model.neighborBombs</span>
+                }
+            </button>
+        }
+        else
+        {
+            <button class="tile" data-x="@ViewData["x"]" data-y="@ViewData["y"]"></button>
         }
     }
-</button>
+    else
+    {
+        <button class="tile bomb" data-x="@ViewData["x"]" data-y="@ViewData["y"]"></button>
+    }
+}

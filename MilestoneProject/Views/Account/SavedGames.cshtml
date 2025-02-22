@@ -1,0 +1,75 @@
+﻿@model List<MilestoneProject.Models.GameModel>
+
+<h2>My Saved Games</h2>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date Saved</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var game in Model)
+            {
+                <tr>
+                    <td>@game.DateSaved.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                    <td>
+                        <button class="btn btn-primary load-game" data-id="@game.ID">Load</button>
+                        <button class="btn btn-danger delete-game" data-id="@game.ID">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No saved games found.</p>
+}
+
+@section Scripts {
+    <script>
+        $(document).on("click", ".delete-game", function () {
+            let gameId = $(this).data("id");
+
+            if (!confirm("Are you sure you want to delete this saved game?")) return;
+
+            $.ajax({
+                url: "/Game/DeleteGame/" + gameId,
+                type: "DELETE",
+                success: function (response) {
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error deleting game:", xhr.responseText);
+                    alert("Failed to delete the game.");
+                }
+            });
+        });
+
+        $(document).on("click", ".load-game", function () {
+            let gameId = $(this).data("id");
+
+            $.ajax({
+                url: "/Game/LoadGame/" + gameId,
+                type: "GET",
+                success: function (response) {
+                    console.log("Loaded Game Data:", response);
+
+                    let redirectUrl = "/Board/Index?gameId=" + response.gameId;
+
+                    window.location.href = redirectUrl;
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error loading game:", xhr.responseText);
+                    alert("Failed to load the game.");
+                }
+            });
+        });
+
+
+    </script>
+}

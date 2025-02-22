@@ -142,6 +142,39 @@ public class BoardService
         }
     }
 
+    public void LoadBoard(List<TileModel> savedTiles)
+    {
+        if (savedTiles == null || savedTiles.Count == 0) return;
+
+        // Calculate board size based on tile count
+        boardSize = (int)Math.Sqrt(savedTiles.Count);
+        board = new TileModel[boardSize, boardSize];
+
+        // Ensure we fill in the correct coordinates
+        foreach (var tile in savedTiles)
+        {
+            if (tile.row < boardSize && tile.column < boardSize)
+            {
+                board[tile.row, tile.column] = new TileModel(tile.row, tile.column, tile.isBomb)
+                {
+                    isBomb = tile.isBomb,
+                    isRevealed = tile.isRevealed,
+                    neighborBombs = tile.neighborBombs,
+                    isFlagged = tile.isFlagged
+                };
+
+                Console.WriteLine($"Assigning Tile: row={tile.row}, col={tile.column}, isBomb={tile.isBomb}, isRevealed={tile.isRevealed}");
+            }
+            else
+            {
+                Console.WriteLine($"ERROR: Tile coordinates out of bounds! row={tile.row}, col={tile.column}");
+            }
+        }
+
+        CalculateNeighborBombs();
+    }
+
+
     // reset start time and do some other stuff here later
     public void GameEnd()
     {

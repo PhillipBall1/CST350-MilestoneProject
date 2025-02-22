@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MilestoneProject.Models;
+using MilestoneProject.Service;
 
 namespace MilestoneProject
 {
@@ -12,8 +13,9 @@ namespace MilestoneProject
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            // Board Service Singleton
+            // Service Singletons
             builder.Services.AddSingleton<BoardService>();
+            builder.Services.AddSingleton<GameService>();
 
             // Connect to DB
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");

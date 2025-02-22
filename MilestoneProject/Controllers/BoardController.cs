@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Data.SqlClient;
 using MilestoneProject.Models;
+using MilestoneProject.Service;
 using System.Runtime.CompilerServices;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text.Json;
 
@@ -11,27 +14,58 @@ namespace MilestoneProject.Controllers
     public class BoardController : Controller
     {
         private readonly BoardService boardService;
+        private readonly GameService gameService;
 
         private float finalScore;
 
         private int baseScore = 500;
 
-        public BoardController(BoardService boardService)
+        public BoardController(BoardService boardService, GameService gameService)
         {
             this.boardService = boardService;
+            this.gameService = gameService;
         }
 
-        // init
-        public IActionResult Index(int boardSize = 10, int difficulty = 0)
+        public IActionResult Index(int gameId = 0, int boardSize = 10, int difficulty = 0)
         {
-            ViewBag.TileSize = (700 / boardSize).ToString() + "px";
-            ViewBag.FontSize = (140 / boardSize * 2).ToString() + "px";
-            boardService.SetBoardSizeAndDifficulty(boardSize, difficulty);
+            var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+            ViewData["UserEmail"] = userEmail;
+
+            if(gameId == 0) // fresh Game
+            { 
+                boardService.SetBoardSizeAndDifficulty(boardSize, difficulty);
+            }
+            else if (gameId > 0) // game loading from save
+            {
+                // the IActionResult from LoadGame
+                var actionResult = gameService.LoadGame(gameId).Result;
+                var okResult = actionResult as OkObjectResult;
+
+                if (okResult == null) return View(boardService.board);
+
+                // extract tiles list
+                var response = okResult.Value as dynamic;
+                List<TileModel> tiles = response?.tiles;
+
+                foreach(TileModel tile in tiles)
+                {
+                    Console.WriteLine(tile.row + " | " + tile.column + " | " + tile.neighborBombs);
+                }
+
+                if (tiles == null || tiles.Count == 0) return View(boardService.board);
+
+                // load tiles into board
+                boardService.LoadBoard(tiles);
+            }
+            Console.WriteLine("Board Size: " + boardService.boardSize);
+            ViewBag.TileSize = (700 / boardService.boardSize).ToString() + "px";
+            ViewBag.FontSize = (140 / boardService.boardSize * 2).ToString() + "px";
 
             return View(boardService.board);
         }
 
-        
+
+
         [HttpPost] // reveals tiles using x and y coords
         public IActionResult RevealTile(int x, int y)
         {
